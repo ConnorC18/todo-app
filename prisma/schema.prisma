@@ -1,0 +1,30 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  // previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Todo {
+  id String @id @default(cuid())
+  text String
+  firstName String?
+  lastName String?
+  status TodoStatus @default(InReview)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum TodoStatus {
+  InReview
+  InProgress
+  Blocked
+  Overdue
+  Completed
+}
