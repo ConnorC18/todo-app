@@ -30,7 +30,7 @@ export default async function TodoList({ q, status, hasName }: FilterSchema) {
 
   const todos = await prisma.todo.findMany({
     where,
-    orderBy: { createdAt: "asc" },
+    orderBy: { createdAt: "desc" },
   });
 
   return (

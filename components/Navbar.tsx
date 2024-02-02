@@ -9,7 +9,7 @@ export default function Navbar() {
           Todo App
         </Link>
         <Button asChild>
-          <Link href="/">Make a ToDo</Link>
+          <Link href="/todo/new">Make a ToDo</Link>
         </Button>
       </nav>
     </header>

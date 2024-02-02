@@ -1,20 +1,11 @@
 "use client";
 import { useFormStatus } from "react-dom";
-import { Button } from "./ui/button";
-import { Loader2 } from "lucide-react";
+import LoadingButton from "./LoadingButton";
 
 export default function FormSubmitButton({
-  children,
   ...props
-}: React.HTMLAttributes<HTMLButtonElement>) {
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const { pending } = useFormStatus();
 
-  return (
-    <Button type="submit" disabled={pending} {...props}>
-      <span className="flex items-center justify-center gap-1">
-        {pending && <Loader2 size={16} className="animate-spin" />}
-        {children}
-      </span>
-    </Button>
-  );
+  return <LoadingButton {...props} type="submit" loading={pending} />;
 }
