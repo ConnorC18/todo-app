@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbo",
     "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "next lint"
@@ -15,6 +15,7 @@
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "date-fns": "^3.3.1",
     "lucide-react": "^0.321.0",
     "next": "14.1.0",
     "react": "^18",
