@@ -2,7 +2,7 @@ import { FilterSchema } from "@/lib/validation";
 import TodoItem from "./TodoItem";
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
-import { TodoStatus } from "@prisma/client";
+import Link from "next/link";
 
 export default async function TodoList({ q, status, hasName }: FilterSchema) {
   const searchString = q
@@ -36,7 +36,9 @@ export default async function TodoList({ q, status, hasName }: FilterSchema) {
   return (
     <div className="flex-grow space-y-4">
       {todos.map((todo) => (
-        <TodoItem key={todo.id} {...todo} />
+        <Link key={todo.id} href={`/todo/${todo.id}`} className="block">
+          <TodoItem {...todo} />
+        </Link>
       ))}
       {todos.length == 0 && (
         <p className="m-auto text-center">Nothing found. Try adjusting your search filters.</p>

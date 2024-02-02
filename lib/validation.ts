@@ -21,6 +21,14 @@ export const $CreateTodo = z
 
 export type CreateTodo = z.infer<typeof $CreateTodo>;
 
+export const $EditTodo = z
+  .object({
+    status: z.nativeEnum(TodoStatus),
+  })
+  .and($CreateTodo);
+
+export type EditTodo = z.infer<typeof $EditTodo>;
+
 export const $FilterSchema = z.object({
   q: z.string().optional(),
   status: z.nativeEnum(TodoStatus).optional().or(z.literal("")),

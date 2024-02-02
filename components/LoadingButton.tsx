@@ -1,9 +1,9 @@
 import { Loader2 } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button, ButtonProps } from "./ui/button";
 
 type Props = {
   loading: boolean;
-} & React.ButtonHTMLAttributes<HTMLButtonElement>;
+} & ButtonProps;
 
 export default function LoadingButton({ children, loading, ...props }: Props) {
   return (

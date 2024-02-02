@@ -9,7 +9,7 @@ import { redirect } from "next/navigation";
 async function filterTodos(formData: FormData) {
   "use server";
 
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  // await new Promise((resolve) => setTimeout(resolve, 1000));
   // console.log(formData.get("q") as string);
 
   const values = Object.fromEntries(formData.entries());
