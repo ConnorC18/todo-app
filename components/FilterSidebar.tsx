@@ -26,7 +26,7 @@ async function filterTodos(formData: FormData) {
 
 export default function FilterSidebar({ q, status, hasName }: FilterSchema) {
   return (
-    <aside className="sticky top-0 h-fit rounded-lg border bg-background p-4 md:w-[260px]">
+    <aside className="top-0 h-fit rounded-lg border bg-background p-4 md:sticky md:w-[260px]">
       <form action={filterTodos} className="space-y-4" key={JSON.stringify({ q, status, hasName })}>
         <div className="flex flex-col gap-2">
           <Label htmlFor="q">Search</Label>

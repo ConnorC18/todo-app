@@ -96,7 +96,7 @@ export default function NewTodoForm() {
               />
             </div>
             <LoadingButton className="w-full" type="submit" loading={isSubmitting}>
-              Create
+              Done
             </LoadingButton>
           </form>
         </Form>

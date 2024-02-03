@@ -135,7 +135,7 @@ export default function EditTodoForm({ id, text, firstName, lastName, status }: 
               />
             </div>
             <LoadingButton className="w-full" type="submit" loading={isSubmitting}>
-              Edit
+              Done
             </LoadingButton>
           </form>
         </Form>
