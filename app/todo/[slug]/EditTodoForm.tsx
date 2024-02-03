@@ -16,7 +16,8 @@ import LoadingButton from "@/components/LoadingButton";
 import { Todo, TodoStatus } from "@prisma/client";
 import Select from "@/components/ui/select";
 import { deleteTodo, editTodo } from "./actions";
-import { useState } from "react";
+import { useFormState } from "react-dom";
+import FormSubmitButton from "@/components/FormSubmitButton";
 
 export default function EditTodoForm({ id, text, firstName, lastName, status }: Todo) {
   const form = useForm<EditTodo>({
@@ -24,7 +25,7 @@ export default function EditTodoForm({ id, text, firstName, lastName, status }: 
     defaultValues: { text, firstName: firstName || "", lastName: lastName || "", status },
   });
 
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [delFormState, delFormAction] = useFormState(deleteTodo, undefined);
 
   const {
     handleSubmit,
@@ -52,18 +53,13 @@ export default function EditTodoForm({ id, text, firstName, lastName, status }: 
             <h2 className="font-semibold">Edit the ToDo</h2>
             <p>Provide the ToDo details</p>
           </div>
-          <LoadingButton
-            className=""
-            variant="destructive"
-            loading={isDeleting}
-            onClick={async () => {
-              setIsDeleting(true); // Make better
-              await deleteTodo(id);
-              setIsDeleting(false);
-            }}
-          >
-            Delete
-          </LoadingButton>
+          <form action={delFormAction}>
+            <input hidden name="id" value={id} />
+            <FormSubmitButton className="" variant="destructive">
+              Delete
+            </FormSubmitButton>
+            {delFormState?.error && <p className="text-sm text-red-500">{delFormState.error}</p>}
+          </form>
         </div>
         <Form {...form}>
           <form className="space-y-4" noValidate onSubmit={handleSubmit(onSubmit)}>

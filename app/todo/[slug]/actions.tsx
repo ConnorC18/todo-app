@@ -28,8 +28,10 @@ export async function editTodo({
   }
 }
 
-export async function deleteTodo(id: string): Promise<FormState> {
+export async function deleteTodo(prevState: any, formData: FormData): Promise<FormState> {
   try {
+    const id = formData.get("id") as string;
+
     await prisma.todo.delete({
       where: { id },
     });
