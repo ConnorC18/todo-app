@@ -22,27 +22,22 @@ import FormSubmitButton from "@/components/FormSubmitButton";
 export default function EditTodoForm({ id, text, firstName, lastName, status }: Todo) {
   const form = useForm<EditTodo>({
     resolver: zodResolver($EditTodo),
-    defaultValues: { text, firstName: firstName || "", lastName: lastName || "", status },
+    defaultValues: { id, text, firstName: firstName || "", lastName: lastName || "", status },
   });
 
   const [delFormState, delFormAction] = useFormState(deleteTodo, undefined);
 
   const {
     handleSubmit,
-    watch,
     trigger,
     control,
-    setValue,
-    setFocus,
-    formState: { isSubmitting },
+    setError,
+    formState: { isSubmitting, errors },
   } = form;
 
   async function onSubmit(values: EditTodo) {
-    try {
-      await editTodo({ id, ...values } as Todo); // Make better
-    } catch {
-      alert("Something went wrong, lease try again.");
-    }
+    const result = await editTodo(values);
+    setError("root", { type: "custom", message: result?.error });
   }
 
   return (
@@ -54,7 +49,7 @@ export default function EditTodoForm({ id, text, firstName, lastName, status }: 
             <p>Provide the ToDo details</p>
           </div>
           <form action={delFormAction}>
-            <input hidden name="id" value={id} />
+            <input readOnly type="hidden" name="id" value={id} />
             <FormSubmitButton className="" variant="destructive">
               Delete
             </FormSubmitButton>
@@ -63,6 +58,19 @@ export default function EditTodoForm({ id, text, firstName, lastName, status }: 
         </div>
         <Form {...form}>
           <form className="space-y-4" noValidate onSubmit={handleSubmit(onSubmit)}>
+            {errors.root && <p className="text-sm text-red-500">{errors.root.message}</p>}
+            <FormField
+              control={control}
+              name="id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input readOnly type="hidden" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={control}
               name="text"

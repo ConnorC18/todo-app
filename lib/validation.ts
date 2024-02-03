@@ -23,6 +23,7 @@ export type CreateTodo = z.infer<typeof $CreateTodo>;
 
 export const $EditTodo = z
   .object({
+    id: requiredString,
     status: z.nativeEnum(TodoStatus),
   })
   .and($CreateTodo);
