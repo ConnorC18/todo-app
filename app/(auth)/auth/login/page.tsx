@@ -38,11 +38,8 @@ export default function Page() {
   } = form;
 
   async function onSubmit(values: LogInSchema) {
-    try {
-      await logInAction(values);
-    } catch {
-      alert("Something went wrong, lease try again.");
-    }
+    const out = await logInAction(values);
+    console.log(out?.error);
   }
 
   return (

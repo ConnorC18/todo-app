@@ -6,4 +6,6 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 export const {
   handlers: { GET, POST },
   auth,
+  signIn,
+  signOut,
 } = NextAuth({ adapter: PrismaAdapter(prisma), session: { strategy: "jwt" }, ...authConfig });

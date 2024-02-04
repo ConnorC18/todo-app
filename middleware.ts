@@ -12,18 +12,18 @@ export default auth((req) => {
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
   const isPubicRoute = publicRoutes.includes(nextUrl.pathname);
 
-  if (isApiAuthRoute) return null;
+  if (isApiAuthRoute) return;
 
   if (isAuthRoute) {
     if (isLoggedIn) return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
-    return null;
+    return;
   }
 
   if (!isLoggedIn && !isPubicRoute) {
     return Response.redirect(new URL("/auth/login", nextUrl));
   }
 
-  return null;
+  return;
 });
 
 export const config = {

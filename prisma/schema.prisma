@@ -36,7 +36,7 @@ model Account {
   token_type        String? // The type of token issued (e.g., Bearer).
   scope             String? // The scope of access granted by the access_token.
   id_token          String? // A JSON Web Token (JWT) that contains the identity of the user.
-  // session_state     String? // An optional field that can be used to manage session state for more sophisticated session handling.
+  session_state     String? // An optional field that can be used to manage session state for more sophisticated session handling.
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

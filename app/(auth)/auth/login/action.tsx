@@ -1,10 +1,29 @@
-import prisma from "@/lib/prisma";
-import { $LogInSchema, LogInSchema } from "@/lib/validation";
+"use server";
 
-type FormState = { error?: string } | undefined;
+import { signIn } from "@/auth";
+import { $LogInSchema, LogInSchema } from "@/lib/validation";
+import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
+import { AuthError } from "next-auth";
 
 export async function logInAction(formData: LogInSchema) {
-  const { email, phone } = $LogInSchema.parse(formData);
+  const validatedFields = $LogInSchema.safeParse(formData);
 
-  return;
+  if (!validatedFields.success) return { error: "Invalid fields" };
+
+  const { email, phone } = validatedFields.data;
+
+  try {
+    await signIn("credentials", { email, phone, redirectTo: DEFAULT_LOGIN_REDIRECT });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin":
+          return { error: "Invalid credentials" };
+        default:
+          return { error: "Something went wrong" };
+      }
+    }
+
+    throw error;
+  }
 }
