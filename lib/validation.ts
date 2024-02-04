@@ -37,3 +37,26 @@ export const $FilterSchema = z.object({
 });
 
 export type FilterSchema = z.infer<typeof $FilterSchema>;
+
+const phoneRegex = new RegExp(/^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/);
+export const $LogInSchema = z
+  .object({
+    email: z.string().email().optional().or(z.literal("")),
+    phone: z
+      .string()
+      .regex(phoneRegex, "Invalid Number")
+      .min(10)
+      .max(10)
+      .optional()
+      .or(z.literal("")),
+  })
+  .refine((data) => data.email || data.phone, {
+    message: "Nether Email or Phone number was given",
+    path: ["email"],
+  })
+  .refine((data) => data.email || data.phone, {
+    message: "Nether Email or Phone number was given",
+    path: ["phone"],
+  });
+
+export type LogInSchema = z.infer<typeof $LogInSchema>;

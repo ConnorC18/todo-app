@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import EditTodoForm from "./EditTodoForm";
+import { auth } from "@/auth";
 
 type Props = {
   params: { slug: string };
@@ -38,6 +39,9 @@ export async function generateMetadata({ params: { slug } }: Props): Promise<Met
 }
 
 export default async function Page({ params: { slug } }: Props) {
+  const session = await auth();
+  return <div>{JSON.stringify(session)}</div>;
+
   const todo = await getTodo(slug);
 
   return <EditTodoForm {...todo} />;

@@ -22,11 +22,8 @@ export default function NewTodoForm() {
 
   const {
     handleSubmit,
-    watch,
     trigger,
     control,
-    setValue,
-    setFocus,
     formState: { isSubmitting },
   } = form;
 
