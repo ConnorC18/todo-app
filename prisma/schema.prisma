@@ -12,11 +12,27 @@ datasource db {
 }
 
 model User {
-  id       String    @id @default(cuid())
-  email    String?   @unique
-  phone    String?   @unique
-  role     UserRole
-  accounts Account[]
+  id                String             @id @default(cuid())
+  email             String?            @unique
+  lastEmailLogin    DateTime?
+  phone             String?            @unique
+  lastPhoneLogin    DateTime?
+  role              UserRole
+  accounts          Account[]
+  verificationToken VerificationToken?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  id       String   @id @default(cuid())
+  token    Int
+  expires  DateTime
+  verified Boolean  @default(false)
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum UserRole {

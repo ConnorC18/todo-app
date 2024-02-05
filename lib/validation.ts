@@ -38,13 +38,14 @@ export const $FilterSchema = z.object({
 
 export type FilterSchema = z.infer<typeof $FilterSchema>;
 
-const phoneRegex = new RegExp(/^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/);
+const numberRegex = new RegExp(/^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/);
 export const $LogInSchema = z
   .object({
+    code: z.string().regex(numberRegex, "Invalid Number").optional(),
     email: z.string().email().optional().or(z.literal("")),
     phone: z
       .string()
-      .regex(phoneRegex, "Invalid Number")
+      .regex(numberRegex, "Invalid Number")
       .min(10)
       .max(10)
       .optional()

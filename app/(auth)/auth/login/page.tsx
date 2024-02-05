@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
 export default function Page() {
   const router = useRouter();
   const [usePhone, setUsePhone] = useState(false);
+  const [showTwoFactor, setShowTwoFactor] = useState(false);
 
   const form = useForm<LogInSchema>({
     resolver: zodResolver($LogInSchema),
@@ -34,6 +35,7 @@ export default function Page() {
     handleSubmit,
     control,
     reset,
+    clearErrors,
     setError,
     formState: { isSubmitting, errors },
   } = form;
@@ -43,50 +45,75 @@ export default function Page() {
     // An error that is not associated with an input field will be persisted until cleared with clearErrors.
     setError("email", { type: "custom", message: out?.error });
     setError("phone", { type: "custom", message: out?.error });
+    setError("code", { type: "custom", message: out?.error });
+
+    if (out?.twoFactor) {
+      setShowTwoFactor(true);
+      clearErrors();
+    }
   }
 
   return (
     <Form {...form}>
       <form className="relative flex flex-col gap-4" noValidate onSubmit={handleSubmit(onSubmit)}>
-        <Button
-          type="button"
-          variant="link"
-          className="absolute right-0 top-0 h-fit p-0 pt-1 text-xs"
-          onClick={() => {
-            setUsePhone(!usePhone);
-            reset();
-          }}
-        >
-          {usePhone ? "Use Email" : "Use Phone Number"}
-        </Button>
-        <FormField
-          control={control}
-          name="email"
-          render={({ field }) => (
-            <FormItem className={cn(usePhone && "hidden")}>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input {...field} type="email" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem className={cn(!usePhone && "hidden")}>
-              <FormLabel>Phone number</FormLabel>
-              <FormControl>
-                <Input {...field} type="tel" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {showTwoFactor && (
+          <FormField
+            control={control}
+            name="code"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Two Factor Code</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="123456" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+        {!showTwoFactor && (
+          <>
+            <Button
+              type="button"
+              variant="link"
+              className="absolute right-0 top-0 h-fit p-0 pt-1 text-xs"
+              onClick={() => {
+                setUsePhone(!usePhone);
+                reset();
+              }}
+            >
+              {usePhone ? "Use Email" : "Use Phone Number"}
+            </Button>
+            <FormField
+              control={control}
+              name="email"
+              render={({ field }) => (
+                <FormItem className={cn(usePhone && "hidden")}>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="email" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem className={cn(!usePhone && "hidden")}>
+                  <FormLabel>Phone number</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="tel" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </>
+        )}
         <LoadingButton className="w-full" type="submit" loading={isSubmitting}>
-          Log In
+          {showTwoFactor ? "Confirm" : "Log In"}
         </LoadingButton>
         <Button type="button" variant="link" className="m-auto w-fit" onClick={() => router.back()}>
           Go back
