@@ -34,12 +34,15 @@ export default function Page() {
     handleSubmit,
     control,
     reset,
+    setError,
     formState: { isSubmitting, errors },
   } = form;
 
   async function onSubmit(values: LogInSchema) {
     const out = await logInAction(values);
-    console.log(out?.error);
+    // An error that is not associated with an input field will be persisted until cleared with clearErrors.
+    setError("email", { type: "custom", message: out?.error });
+    setError("phone", { type: "custom", message: out?.error });
   }
 
   return (

@@ -21,13 +21,13 @@ const getTodo = cache(async (slug: string) => {
 });
 
 // For static render
-export async function generateStaticParams() {
-  const todos = await prisma.todo.findMany({
-    select: { id: true },
-  });
+// export async function generateStaticParams() {
+//   const todos = await prisma.todo.findMany({
+//     select: { id: true },
+//   });
 
-  return todos.map(({ id }) => id);
-}
+//   return todos.map(({ id }) => id);
+// }
 
 // For dynamic metadata, like page title
 export async function generateMetadata({ params: { slug } }: Props): Promise<Metadata> {

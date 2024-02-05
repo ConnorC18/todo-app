@@ -8,6 +8,11 @@ import { $LogInSchema } from "./lib/validation";
 export default {
   providers: [
     credentials({
+      // Optional for /api/auth/signin
+      credentials: {
+        email: { label: "Email", type: "email" },
+        phone: { label: "Phone", type: "tel" },
+      },
       async authorize(credentials, req) {
         const validatedFields = $LogInSchema.safeParse(credentials);
 
