@@ -42,10 +42,12 @@ export default function Page() {
 
   async function onSubmit(values: LogInSchema) {
     const out = await logInAction(values);
-    // An error that is not associated with an input field will be persisted until cleared with clearErrors.
-    setError("email", { type: "custom", message: out?.error });
-    setError("phone", { type: "custom", message: out?.error });
-    setError("code", { type: "custom", message: out?.error });
+    if (out?.error) {
+      // An error that is not associated with an input field will be persisted until cleared with clearErrors.
+      setError("email", { type: "custom", message: out.error });
+      setError("phone", { type: "custom", message: out.error });
+      setError("code", { type: "custom", message: out.error });
+    }
 
     if (out?.twoFactor) {
       setShowTwoFactor(true);

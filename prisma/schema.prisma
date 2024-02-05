@@ -18,7 +18,6 @@ model User {
   phone             String?            @unique
   lastPhoneLogin    DateTime?
   role              UserRole
-  accounts          Account[]
   verificationToken VerificationToken?
 
   createdAt DateTime @default(now())
@@ -26,37 +25,17 @@ model User {
 }
 
 model VerificationToken {
-  id       String   @id @default(cuid())
   token    Int
   expires  DateTime
   verified Boolean  @default(false)
 
-  userId String @unique
+  userId String @id @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum UserRole {
   USER
   ADMIN
-}
-
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String // The type of account, which could describe the nature of the account (e.g., OAuth, email, etc.).
-  provider          String // The name of the service provider (e.g., Google, Facebook) for this account.
-  providerAccountId String // An identifier for the user specific to the provider, helping to distinguish between different accounts from the same provider.
-  refresh_token     String? // Used to obtain a new access_token once the current access_token expires, without requiring the user to log in again.
-  access_token      String? // A token that grants temporary access to the user's account.
-  expires_at        Int? // The timestamp when the access_token expires.
-  token_type        String? // The type of token issued (e.g., Bearer).
-  scope             String? // The scope of access granted by the access_token.
-  id_token          String? // A JSON Web Token (JWT) that contains the identity of the user.
-  session_state     String? // An optional field that can be used to manage session state for more sophisticated session handling.
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
 }
 
 model Todo {

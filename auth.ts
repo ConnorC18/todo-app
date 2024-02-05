@@ -43,7 +43,7 @@ export const {
         return false;
 
       await prisma.verificationToken.delete({
-        where: { id: verificationToken.id },
+        where: { userId: user.id },
       });
 
       return true;

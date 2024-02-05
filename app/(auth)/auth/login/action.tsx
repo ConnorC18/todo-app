@@ -27,7 +27,7 @@ export async function logInAction(formData: LogInSchema) {
   if (!code) {
     if (user.verificationToken) {
       await prisma.verificationToken.delete({
-        where: { id: user.verificationToken.id },
+        where: { userId: user.id },
       });
     }
 
@@ -51,7 +51,7 @@ export async function logInAction(formData: LogInSchema) {
   if (user.verificationToken.token.toString() !== code) return { error: "Invalid token" };
 
   await prisma.verificationToken.update({
-    where: { id: user.verificationToken.id },
+    where: { userId: user.id },
     data: { verified: true },
   });
 
