@@ -7,10 +7,10 @@ const requiredString = z.string().min(1, "Required");
 
 const requiredPhoneNumber = z
   .string()
-  .regex(numberRegex, "Invalid Number")
-  .min(10)
-  .max(10)
-  .refine((data) => data.startsWith("07"), "Phone number need to starts with 07...");
+  .transform((str) => str.trim().replaceAll(" ", ""))
+  .refine((data) => numberRegex.test(data), "Invalid Number")
+  .refine((data) => data.length === 10, { message: "Must be exactly 10 digits long." })
+  .refine((data) => data.startsWith("07"), { message: "Needs to start with 07..." });
 
 const nameSchema = z
   .object({

@@ -16,7 +16,7 @@ import {
 import LoadingButton from "@/components/LoadingButton";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn, formatPhoneNumber } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
 // TODO: Remove default from every component!
@@ -59,19 +59,24 @@ export default function Page() {
     <Form {...form}>
       <form className="relative flex flex-col gap-4" noValidate onSubmit={handleSubmit(onSubmit)}>
         {showTwoFactor && (
-          <FormField
-            control={control}
-            name="code"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Two Factor Code</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="123456" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <>
+            <p className="absolute right-0 top-0 h-fit p-0 pt-1 text-xs">
+              Wait 2 min to get the code
+            </p>
+            <FormField
+              control={control}
+              name="code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Two Factor Code</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="1234" autoFocus />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </>
         )}
         {!showTwoFactor && (
           <>
@@ -106,7 +111,11 @@ export default function Page() {
                 <FormItem className={cn(!usePhone && "hidden")}>
                   <FormLabel>Phone number</FormLabel>
                   <FormControl>
-                    <Input {...field} type="tel" />
+                    <Input
+                      {...field}
+                      type="tel"
+                      onChange={(e) => field.onChange(formatPhoneNumber(e.target.value))}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
