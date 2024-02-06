@@ -5,8 +5,9 @@ import { $LogInSchema, LogInSchema } from "@/lib/validation";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { AuthError } from "next-auth";
 import prisma from "@/lib/prisma";
-import crypto from "crypto";
-import { use } from "react";
+import { convertToE164 } from "@/lib/utils";
+import vonage from "@/lib/vonage";
+import { Channels } from "@vonage/verify2";
 
 export async function logInAction(formData: LogInSchema) {
   const validatedFields = $LogInSchema.safeParse(formData);
@@ -19,40 +20,95 @@ export async function logInAction(formData: LogInSchema) {
     where: {
       OR: [{ email }, { phone }],
     },
-    include: { verificationToken: true },
   });
 
   if (!user) return { error: "Invalid credentials" };
 
+  let to, channel;
+  if (email) {
+    to = email;
+    channel = Channels.EMAIL;
+  } else if (phone) {
+    to = convertToE164(phone);
+    channel = Channels.SMS;
+  } else {
+    return { error: "Hmm, refresh and try again?" };
+  }
+
   if (!code) {
-    if (user.verificationToken) {
-      await prisma.verificationToken.delete({
-        where: { userId: user.id },
+    try {
+      if (user.verifyRequestId) {
+        await vonage.verify2.cancel(user.verifyRequestId).catch();
+
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { verifyRequestId: null },
+        });
+      }
+
+      const { requestId } = await vonage.verify2.newRequest({
+        brand: "TODO App",
+        workflow: [{ channel, to }],
+        channelTimeout: 300,
+        codeLength: 4,
       });
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          verifyRequestId: requestId,
+        },
+      });
+    } catch (e: any) {
+      if (!e.response || !e.response.status) return { error: "Something went really wrong" };
+
+      switch (e.response.status) {
+        case 409: // Should never show
+          return { error: "Concurrent verifications to the same number are not allowed" };
+        case 422: // Should never show
+          return { error: "The value of one or more parameters is invalid" };
+        case 429:
+          return { error: "Please wait, then retry your request" };
+        default:
+          return { error: "Something went really wrong" };
+      }
     }
-
-    const vToken = await prisma.verificationToken.create({
-      data: {
-        token: crypto.randomInt(100_000, 1_000_000),
-        expires: new Date(new Date().getTime() + 300 * 1000),
-        userId: user.id,
-      },
-    });
-
-    // TODO: send token by email or sms
 
     return { twoFactor: true };
   }
 
-  if (!user.verificationToken) return { error: "What? No token found" };
+  if (!user.verifyRequestId) return { error: "what?" };
 
-  if (user.verificationToken.expires < new Date()) return { error: "Token expired" };
+  try {
+    const status = await vonage.verify2.checkCode(user.verifyRequestId, code);
+    if (status != "completed") throw Error();
+  } catch (e: any) {
+    if (!e.response || !e.response.status) return { error: "Something went really wrong" };
 
-  if (user.verificationToken.token.toString() !== code) return { error: "Invalid token" };
+    switch (e.response.status) {
+      case 400:
+        return { error: "Invalid Code" };
+      case 404:
+        return { error: "Token Expired" };
+      case 409:
+        return { error: "The current Verify workflow step does not support a code" };
+      case 410:
+        return { error: "Too Many Tries, refresh and try again" };
+      case 429:
+        return { error: "Rate Limit Hit, try again later" };
+      default:
+        return { error: "Token Expired" };
+    }
+  }
 
-  await prisma.verificationToken.update({
-    where: { userId: user.id },
-    data: { verified: true },
+  const nowDate = new Date();
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      ...(email ? { lastEmailLogin: nowDate } : {}),
+      ...(phone ? { lastPhoneLogin: nowDate } : {}),
+      loginVerified: new Date(nowDate.getTime() + 300 * 1000),
+    },
   });
 
   try {

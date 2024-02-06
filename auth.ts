@@ -2,17 +2,10 @@ import NextAuth, { type DefaultSession } from "next-auth";
 import authConfig from "@/auth.config";
 import prisma from "@/lib/prisma";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { UserRole } from "@prisma/client";
+import { User as PrismaUser } from "@prisma/client";
 
-// https://authjs.dev/getting-started/typescript
 declare module "next-auth" {
-  interface User {}
-  interface Account {}
-  interface Session {
-    user: {
-      role: UserRole;
-    } & DefaultSession["user"];
-  }
+  interface User extends PrismaUser {}
 }
 
 export const {
@@ -27,23 +20,11 @@ export const {
   },
   callbacks: {
     async signIn({ user }) {
-      // user is the exact user object return from authorize func
-      // and this func is run only at the login
-      // return true for letting the user login or false for not
+      if (!user.loginVerified || user.loginVerified < new Date()) return false;
 
-      const verificationToken = await prisma.verificationToken.findUnique({
-        where: { userId: user.id },
-      });
-
-      if (
-        !verificationToken ||
-        !verificationToken.verified ||
-        verificationToken.expires < new Date() // redundant but ok
-      )
-        return false;
-
-      await prisma.verificationToken.delete({
-        where: { userId: user.id },
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { loginVerified: null, verifyRequestId: null },
       });
 
       return true;

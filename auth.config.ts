@@ -21,7 +21,6 @@ export default {
             where: {
               OR: [{ email }, { phone }],
             },
-            // include: { verificationToken: true }, problem with types in auth.js
           });
 
           if (!user) return null;

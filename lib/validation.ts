@@ -1,7 +1,16 @@
 import { z } from "zod";
 import { TodoStatus } from "@prisma/client";
 
+const numberRegex = new RegExp(/^[0-9]*$/);
+
 const requiredString = z.string().min(1, "Required");
+
+const requiredPhoneNumber = z
+  .string()
+  .regex(numberRegex, "Invalid Number")
+  .min(10)
+  .max(10)
+  .refine((data) => data.startsWith("07"), "Phone number need to starts with 07...");
 
 const nameSchema = z
   .object({
@@ -38,18 +47,11 @@ export const $FilterSchema = z.object({
 
 export type FilterSchema = z.infer<typeof $FilterSchema>;
 
-const numberRegex = new RegExp(/^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/);
 export const $LogInSchema = z
   .object({
-    code: z.string().regex(numberRegex, "Invalid Number").optional(),
+    code: z.string().regex(numberRegex, "Invalid Number").max(4).optional(),
     email: z.string().email().optional().or(z.literal("")),
-    phone: z
-      .string()
-      .regex(numberRegex, "Invalid Number")
-      .min(10)
-      .max(10)
-      .optional()
-      .or(z.literal("")),
+    phone: requiredPhoneNumber.optional().or(z.literal("")),
   })
   .refine((data) => data.email || data.phone, {
     message: "Nether Email or Phone number was given",
