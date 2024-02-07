@@ -3,7 +3,9 @@
  * These routes do not require authentication
  * @type {string[]}
  */
-export const publicRoutes = ["/", "/todo/new"];
+export const publicRoutes = ["/"];
+
+export const userRoutes = ["/todo/new"];
 
 /**
  * An array of routes that are used for authentication

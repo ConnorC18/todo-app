@@ -2,7 +2,17 @@ import NextAuth, { type DefaultSession } from "next-auth";
 import authConfig from "@/auth.config";
 import prisma from "@/lib/prisma";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { User as PrismaUser } from "@prisma/client";
+import { User as PrismaUser, UserRole } from "@prisma/client";
+import { JWT } from "next-auth/jwt";
+
+declare module "next-auth/jwt" {
+  /** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
+  interface JWT {
+    /** OpenID ID Token */
+    idToken?: string;
+    role: UserRole;
+  }
+}
 
 declare module "next-auth" {
   interface User extends PrismaUser {}
@@ -52,6 +62,7 @@ export const {
     },
   },
   adapter: PrismaAdapter(prisma),
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: 365 * 24 * 60 * 60 },
+  jwt: { maxAge: 365 * 24 * 60 * 60 },
   ...authConfig,
 });

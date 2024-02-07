@@ -5,6 +5,7 @@ import Select from "./ui/select";
 import FormSubmitButton from "./FormSubmitButton";
 import { $FilterSchema, FilterSchema } from "@/lib/validation";
 import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 
 async function filterTodos(formData: FormData) {
   "use server";
@@ -24,7 +25,9 @@ async function filterTodos(formData: FormData) {
   redirect(`/?${searchParams.toString()}`);
 }
 
-export default function FilterSidebar({ q, status, hasName }: FilterSchema) {
+export default async function FilterSidebar({ q, status, hasName }: FilterSchema) {
+  const userRole = (await auth())?.user?.role;
+
   return (
     <aside className="top-0 h-fit rounded-lg border bg-background p-4 md:sticky md:w-[260px]">
       <form action={filterTodos} className="space-y-4" key={JSON.stringify({ q, status, hasName })}>
@@ -36,11 +39,15 @@ export default function FilterSidebar({ q, status, hasName }: FilterSchema) {
           <Label htmlFor="status">Status</Label>
           <Select id="status" name="status" defaultValue={status}>
             <option value="">All</option>
-            {Object.values(TodoStatus).map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
+            {Object.values(TodoStatus).map((status) => {
+              if (userRole != "ADMIN" && status == "InReview") return;
+
+              return (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              );
+            })}
           </Select>
         </div>
         <div className="flex items-center gap-2">

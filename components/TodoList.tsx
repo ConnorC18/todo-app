@@ -3,8 +3,11 @@ import TodoItem from "./TodoItem";
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import Link from "next/link";
+import { auth } from "@/auth";
 
 export default async function TodoList({ q, status, hasName }: FilterSchema) {
+  const userRole = (await auth())?.user?.role;
+
   const searchString = q
     ?.split(" ")
     .filter((word) => word.length > 0)
@@ -27,6 +30,10 @@ export default async function TodoList({ q, status, hasName }: FilterSchema) {
   const where: Prisma.TodoWhereInput = {
     AND: [searchFilter, hasNameFilter, status ? { status } : {}],
   };
+
+  if (userRole != "ADMIN") {
+    where.NOT = { status: "InReview" };
+  }
 
   const todos = await prisma.todo.findMany({
     where,
