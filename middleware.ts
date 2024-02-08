@@ -39,7 +39,12 @@ export default auth((req) => {
   if (!isLoggedIn) return redirectTo("/auth/login");
 
   // Redirect logged-in, non-admin users trying to access restricted admin routes
-  if (!isAdmin && !isUserRoute) return redirectTo(DEFAULT_LOGIN_REDIRECT);
+  if (!isAdmin && !isUserRoute) {
+    nextUrl.searchParams.set("error", "Access Denied");
+    nextUrl.pathname = "/auth/error";
+
+    return Response.redirect(nextUrl);
+  }
 
   return;
 });

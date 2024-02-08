@@ -3,7 +3,7 @@
  * These routes do not require authentication
  * @type {string[]}
  */
-export const publicRoutes = ["/"];
+export const publicRoutes = ["/", "/auth/error"];
 
 export const userRoutes = ["/todo/new"];
 
@@ -12,7 +12,7 @@ export const userRoutes = ["/todo/new"];
  * These routes will redirect logged in users to /settings
  * @type {string[]}
  */
-export const authRoutes = ["/auth/login", "/auth/error"];
+export const authRoutes = ["/auth/login"];
 
 /**
  * The prefix for API authentication routes
