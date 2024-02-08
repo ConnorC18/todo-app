@@ -28,7 +28,7 @@ export default function Page() {
 
   const form = useForm<LogInSchema>({
     resolver: zodResolver($LogInSchema),
-    defaultValues: { email: "", phone: "" },
+    defaultValues: { email: "", phone: "", code: "" },
   });
 
   const {
