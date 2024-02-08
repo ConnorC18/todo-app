@@ -17,12 +17,14 @@ import LoadingButton from "@/components/LoadingButton";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { cn, formatPhoneNumber } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 // TODO: Remove default from every component!
 
 export default function Page() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [usePhone, setUsePhone] = useState(false);
   const [showTwoFactor, setShowTwoFactor] = useState(false);
 
@@ -41,7 +43,7 @@ export default function Page() {
   } = form;
 
   async function onSubmit(values: LogInSchema) {
-    const out = await logInAction(values);
+    const out = await logInAction(values, searchParams.get("callbackUrl"));
     if (out?.error) {
       // An error that is not associated with an input field will be persisted until cleared with clearErrors.
       setError("email", { type: "custom", message: out.error });

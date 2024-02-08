@@ -9,7 +9,7 @@ import { convertToE164 } from "@/lib/utils";
 import vonage from "@/lib/vonage";
 import { Channels } from "@vonage/verify2";
 
-export async function logInAction(formData: LogInSchema) {
+export async function logInAction(formData: LogInSchema, callbackUrl?: string | null) {
   const validatedFields = $LogInSchema.safeParse(formData);
 
   if (!validatedFields.success) return { error: "Invalid fields" };
@@ -112,7 +112,11 @@ export async function logInAction(formData: LogInSchema) {
   });
 
   try {
-    await signIn("credentials", { email, phone, redirectTo: DEFAULT_LOGIN_REDIRECT });
+    await signIn("credentials", {
+      email,
+      phone,
+      redirectTo: callbackUrl || DEFAULT_LOGIN_REDIRECT,
+    });
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {

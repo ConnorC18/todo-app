@@ -36,7 +36,13 @@ export default auth((req) => {
   }
 
   // Redirect non-logged-in users trying to access protected routes
-  if (!isLoggedIn) return redirectTo("/auth/login");
+  if (!isLoggedIn) {
+    let callbackUrl = nextUrl.pathname;
+    if (nextUrl.search) callbackUrl += nextUrl.search;
+
+    const encodedCallbackUrl = encodeURIComponent(callbackUrl);
+    return redirectTo(`/auth/login?callbackUrl=${encodedCallbackUrl}`);
+  }
 
   // Redirect logged-in, non-admin users trying to access restricted admin routes
   if (!isAdmin && !isUserRoute) {
