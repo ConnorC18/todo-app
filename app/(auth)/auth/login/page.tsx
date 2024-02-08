@@ -24,6 +24,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 export default function Page() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
 
   const [usePhone, setUsePhone] = useState(false);
   const [showTwoFactor, setShowTwoFactor] = useState(false);
@@ -43,7 +44,7 @@ export default function Page() {
   } = form;
 
   async function onSubmit(values: LogInSchema) {
-    const out = await logInAction(values, searchParams.get("callbackUrl"));
+    const out = await logInAction(values, callbackUrl);
     if (out?.error) {
       // An error that is not associated with an input field will be persisted until cleared with clearErrors.
       setError("email", { type: "custom", message: out.error });
@@ -59,6 +60,9 @@ export default function Page() {
 
   return (
     <Form {...form}>
+      {callbackUrl && (
+        <h2 className="w-full text-center text-lg font-semibold">You first need to Log In</h2>
+      )}
       <form className="relative flex flex-col gap-4" noValidate onSubmit={handleSubmit(onSubmit)}>
         {showTwoFactor && (
           <>
