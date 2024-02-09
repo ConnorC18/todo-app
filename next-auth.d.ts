@@ -23,7 +23,7 @@ type ExtendedJWT = DefaultJWT & UserTypes;
 
 declare module "next-auth/jwt" {
   interface JWT extends ExtendedJWT {
-    // Properties you want in the JWT that you are not extending to the session
+    // Properties you want in the JWT that you are not extending to the session. This already contains everything in UserTypes
     lastEmailLogin: Date | null;
     lastPhoneLogin: Date | null;
     loginVerified: Date | null;
